@@ -1,5 +1,12 @@
-class TrieNode {
+import java.util.HashMap;
+import java.util.Map;
 
-  TrieNode[] children = new TrieNode[26];
-  boolean isCompleteWord;
+public class TrieNode {
+
+  Map<Character, TrieNode> children;
+  boolean isEndOfWord;
+
+  public TrieNode() {
+    children = new HashMap<>();
+  }
 }
