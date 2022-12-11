@@ -1,6 +1,11 @@
+// Java implementation of delete
+// operations on Trie
+
+import java.util.Stack;
+
 public class Trie {
 
-  private final TrieNode root;
+  TrieNode root;
 
   public Trie() {
     root = new TrieNode();
@@ -9,11 +14,11 @@ public class Trie {
   public void insert(String word) {
     TrieNode current = root;
     for (int i = 0; i < word.length(); i++) {
-      char currentChar = word.charAt(i);
-      if (!current.children.containsKey(currentChar)) {
-        current.children.put(currentChar, new TrieNode());
+      int index = word.charAt(i) - 'a';
+      if (current.children[index] == null) {
+        current.children[index] = new TrieNode();
       }
-      current = current.children.get(currentChar);
+      current = current.children[index];
     }
     current.isEndOfWord = true;
   }
@@ -21,46 +26,60 @@ public class Trie {
   public boolean search(String word) {
     TrieNode current = root;
     for (int i = 0; i < word.length(); i++) {
-      char currentChar = word.charAt(i);
-      if (!current.children.containsKey(currentChar)) {
+      int index = word.charAt(i) - 'a';
+      if (current.children[index] == null) {
         return false;
       }
-      current = current.children.get(currentChar);
+      current = current.children[index];
     }
     return current.isEndOfWord;
   }
 
-  public boolean searchPrefix(String prefix) {
+  public boolean searchPrefix(String word) {
     TrieNode current = root;
-    for (int i = 0; i < prefix.length(); i++) {
-      char currentChar = prefix.charAt(i);
-      if (!current.children.containsKey(currentChar)) {
+    for (int i = 0; i < word.length(); i++) {
+      int index = word.charAt(i) - 'a';
+      if (current.children[index] == null) {
         return false;
       }
-      current = current.children.get(currentChar);
+      current = current.children[index];
     }
     return true;
   }
 
   public void delete(String word) {
-    TrieNode lastSharedNode = root;
-    int indexToBeDeleted = 0;
     TrieNode current = root;
+    Stack<TrieNode> stack = new Stack<>(); // Keep track of nodes visited
     for (int i = 0; i < word.length(); i++) {
-      char currentChar = word.charAt(i);
-      if (!current.children.containsKey(currentChar)) {
+      int index = word.charAt(i) - 'a';
+      if (current.children[index] == null) {
         return;
       }
-      if (current.children.size() > 1 || current.isEndOfWord) {
-        lastSharedNode = current;
-        indexToBeDeleted = i;
-      }
-      current = current.children.get(currentChar);
+      stack.push(current);
+      current = current.children[index];
     }
-    if (current.children.size() > 0) {
-      current.isEndOfWord = false;
-    } else {
-      lastSharedNode.children.remove(word.charAt(indexToBeDeleted));
+    current.isEndOfWord = false;
+
+    // Delete nodes if they are not part of any other word
+    while (!stack.isEmpty()) {
+      TrieNode node = stack.pop();
+      if (node.isEndOfWord) {
+        return;
+      }
+      for (int i = 0; i < 26; i++) {
+        if (node.children[i] != null) {
+          return;
+        }
+      }
+      if (!stack.isEmpty()) {
+        TrieNode parent = stack.peek();
+        for (int i = 0; i < 26; i++) {
+          if (parent.children[i] == node) {
+            parent.children[i] = null;
+            break;
+          }
+        }
+      }
     }
   }
 }
