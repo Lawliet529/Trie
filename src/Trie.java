@@ -1,8 +1,3 @@
-// Java implementation of delete
-// operations on Trie
-
-import java.util.Stack;
-
 public class Trie {
 
   TrieNode root;
@@ -49,20 +44,21 @@ public class Trie {
 
   public void delete(String word) {
     TrieNode current = root;
-    Stack<TrieNode> stack = new Stack<>(); // Keep track of nodes visited
+    TrieNode[] stack = new TrieNode[word.length()];
+    int top = -1;
     for (int i = 0; i < word.length(); i++) {
       int index = word.charAt(i) - 'a';
       if (current.children[index] == null) {
         return;
       }
-      stack.push(current);
+      stack[++top] = current;
       current = current.children[index];
     }
     current.isEndOfWord = false;
 
     // Delete nodes if they are not part of any other word
-    while (!stack.isEmpty()) {
-      TrieNode node = stack.pop();
+    while (top >= 0) {
+      TrieNode node = stack[top--];
       if (node.isEndOfWord) {
         return;
       }
@@ -71,8 +67,8 @@ public class Trie {
           return;
         }
       }
-      if (!stack.isEmpty()) {
-        TrieNode parent = stack.peek();
+      if (top >= 0) {
+        TrieNode parent = stack[top];
         for (int i = 0; i < 26; i++) {
           if (parent.children[i] == node) {
             parent.children[i] = null;
