@@ -58,6 +58,7 @@ public class Trie {
 
     // Delete nodes if they are not part of any other word
     while (top >= 0) {
+      char currentChar = word.charAt(top);
       TrieNode node = stack[top--];
       if (node.isEndOfWord) {
         return;
@@ -69,12 +70,7 @@ public class Trie {
       }
       if (top >= 0) {
         TrieNode parent = stack[top];
-        for (int i = 0; i < 26; i++) {
-          if (parent.children[i] == node) {
-            parent.children[i] = null;
-            break;
-          }
-        }
+        parent.children[currentChar - 'a'] = null;
       }
     }
   }
